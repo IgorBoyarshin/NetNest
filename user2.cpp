@@ -44,9 +44,9 @@ bool isReadyToRead(int socketHandle) {
 
 
 int client(const std::string& userName) {
-    std::cout << "----- START CLIENT of " << userName << "-----" << std::endl;
+    /* std::cout << "----- START CLIENT of " << userName << "-----" << std::endl; */
 
-    for (int i=0; i < 4; i++) {
+    for (int i=0; i < 100; i++) {
         /* std::cout << "=============== " << i << std::endl; */
         int socketHandle = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
         if (socketHandle < 0) {
@@ -61,28 +61,27 @@ int client(const std::string& userName) {
         inet_aton("192.168.1.3", &destinationSocketInfo.sin_addr);
 
         while (connect(socketHandle, reinterpret_cast<sockaddr*>(&destinationSocketInfo), sizeof(destinationSocketInfo)) < 0) {
-            std::cout << "-- Could not establish connection..." << std::endl;
+            /* std::cout << "-- Could not establish connection..." << std::endl; */
             const unsigned int seconds = 1;
             sleep(seconds);
         }
-        std::cout << "-- Connection to the server established!" << std::endl;
+        /* std::cout << "-- Connection to the server established!" << std::endl; */
 
-        std::cout << "**** send 1" << std::endl;
-        char buff[512] = "  hello from Anka\0";
-        buff[0] = i + '1';
+        char buff[512] = "Masik loves Hedgehog more!\0";
+        std::cout << userName << " says: " << buff << std::endl;
         send(socketHandle, buff, strlen(buff) + 1, 0);
-        sleep(1);
+        sleep(7);
 
         close(socketHandle);
     }
 
-    std::cout << "-----  END CLIENT of " << userName << " -----" << std::endl;
+    /* std::cout << "-----  END CLIENT of " << userName << " -----" << std::endl; */
     return 0;
 }
 
 
 int server(const std::string& userName) {
-    std::cout << "----- START SERVER of " << userName << "-----" << std::endl;
+    /* std::cout << "----- START SERVER of " << userName << "-----" << std::endl; */
 
     signal(SIGCHLD, handleSignal); // TODO: check if needed
 
@@ -114,12 +113,12 @@ int server(const std::string& userName) {
 
     for (unsigned int counter = 0; counter < 10;) {
         if (!isReadyToRead(socketHandle)) {
-            std::cout << "-- No incoming packets..." << std::endl;
+            /* std::cout << "-- No incoming packets..." << std::endl; */
             const unsigned int seconds = 1;
             sleep(seconds);
             continue;
         }
-        std::cout << "++ Packet arrived" << std::endl;
+        /* std::cout << "++ Packet arrived" << std::endl; */
 
         sockaddr_in incomingSocketInfo;
         socklen_t incomingSocketSize = sizeof(incomingSocketInfo);
@@ -146,13 +145,14 @@ int server(const std::string& userName) {
             case 0: // child
                 close(socketHandle);
                 {
-                    std::cout << "== Processing packet..." << std::endl;
+                    /* std::cout << "== Processing packet..." << std::endl; */
                     char buff[512];
                     int rc = recv(socketConnection, buff, 512, 0);
                     buff[rc] = '\0';
 
                     /* std::cout << "== Read " << rc << " bytes" << std::endl; */
-                    std::cout << "== Received: " << buff << std::endl;
+                    /* std::cout << "== Received: " << buff << std::endl; */
+                    std::cout << userName << " hears: " << buff << std::endl;
                 }
                 exit(0);
             default: // parent
@@ -166,13 +166,13 @@ int server(const std::string& userName) {
     while (waitpid(-1, NULL, 0)) if (errno == ECHILD) break;
 
     close(socketHandle);
-    std::cout << "-----  END SERVER of " << userName << " -----" << std::endl;
+    /* std::cout << "-----  END SERVER of " << userName << " -----" << std::endl; */
     return 0;
 }
 
 
 int main() {
-    const std::string username("User1");
+    const std::string username("Masik");
     std::cout << "----- " << username << " START -----" << std::endl;
 
     switch(fork()) {
