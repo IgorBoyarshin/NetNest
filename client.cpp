@@ -24,8 +24,9 @@ int main() {
     struct sockaddr_in socketInfo;
     memset(&socketInfo, 0, sizeof(sockaddr_in));
     socketInfo.sin_family = AF_INET;
-    inet_aton("127.0.0.1", &socketInfo.sin_addr);
-    socketInfo.sin_port = htons(2345);
+    /* inet_aton("127.0.0.1", &socketInfo.sin_addr); */
+    inet_aton("192.168.1.3", &socketInfo.sin_addr);
+    socketInfo.sin_port = htons(2343);
 
     /* struct hostent* hPtr; */
     if (connect(socketHandle, reinterpret_cast<sockaddr*>(&socketInfo), sizeof(socketInfo)) < 0) {
